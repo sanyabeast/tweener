@@ -50,7 +50,6 @@
 		this.setup(target, duration, to, from);
 
 		this.tick = this.tick.bind(this);
-		this.startDate = +new Date();
 
 		if (this.to.paused != true){
 			this.restart();
@@ -86,8 +85,7 @@
 			this.started = false;
 			this.paused = false;
 			this.pauseProgress = 0;
-			this.startDate = +new Date();
-			this.resume();
+			this.resume(true);
 		},
 		pause : function(){
 			if (this.paused){
@@ -99,17 +97,20 @@
 			this.removeTask();
 			this.pauseProgress = this.progress;
 		},
-		resume : function(){
+		resume : function(restart){
 			if (this.started){
 				return;
 			}
 
-			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0));
+			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0)) + (restart ? ((this.to.delay || 0) * 1000) : 0);
 			this.removeTask = unicycle.addTask(this.tick);
 			this.paused = false;
 		},
 		get progress(){
-			return (+new Date() - this.startDate) / this.duration;
+			var progress = (+new Date() - this.startDate) / this.duration;
+			if (progress < 0) progress = 0;
+			if (progress > 1) progress = 1;
+			return progress;
 		},
 		set progress(value){
 			this.startDate = (+new Date() - this.duration * value);
@@ -170,8 +171,6 @@
 			if (this.onUpdate) this.onUpdate(this);
 
 			if (this.progress >= 1){
-				this.yoyoPhase ? this.applyValues(this.target, this.from) : this.applyValues(this.target, this.to);
-
 				var expire = true;
 
 				this.repeatCount++;
