@@ -9,11 +9,11 @@ requirejs(["tweener"], function(tweener){
 
 	window.tweener = tweener;
 
-	var tween = tweener.to(window.box, 5, {
+	var tween = tweener.to(window.box, 1, {
 		x : 300,
 		y : 300,
 		scale : 0.1,
-		repeat : 20,
+		repeat : 2,
 		yoyo : true,
 		delay : 1,
 		ease : "easeInQuad",

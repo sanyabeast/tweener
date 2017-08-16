@@ -47,14 +47,8 @@
 
 	var Tween = function(tweener, target, duration, to, from){
 		this.tweener = tweener;
-		this.setup(target, duration, to, from);
-
 		this.tick = this.tick.bind(this);
-
-		if (this.to.paused != true){
-			this.restart();
-		}
-
+		this.setup(target, duration, to, from);
 	};
 
 	Tween.prototype = {
@@ -75,6 +69,12 @@
 			if (to.onStart) this.onStart = to.onStart;
 			if (to.onComplete) this.onComplete = to.onComplete;
 			if (to.onRepeat) this.onRepeat = to.onRepeat;
+
+			if (this.to.paused != true){
+				this.restart();
+			}
+
+			return this;
 		},
 		restart : function(){
 			if (this.removeTask){
@@ -185,12 +185,19 @@
 					this.removeTask();
 					delete this.removeTask();
 					if (this.onComplete) this.onComplete(this);
+					if (this.to.save !== true){
+						this.kill();
+					}
 				} else {
 					if (this.to.yoyo) this.yoyoPhase = !this.yoyoPhase;
 					this.progress = 0;
 					if (this.onRepeat) this.onRepeat(this);
 				}	
 			}
+		},
+		kill : function(){
+			if (this.removeTask) this.removeTask();
+			this.tweener.pool.add(this);
 		}
 	};
 
@@ -203,11 +210,30 @@
 	Tweener.prototype = {
 		Tween : Tween,
 		EasingFunctions : EasingFunctions,
+		pool : {
+			content : [],
+			add : function(tween){
+				this.content.push(tween);
+			},
+			get : function(){
+				return this.content.pop();
+			}
+		},
 		to : function(target, duration, to){
-			return new Tween(this, target, duration, to);
+			var tween = this.pool.get();
+			if (tween){
+				return tween.setup(target, duration, to);
+			} else {
+				return new Tween(this, target, duration, to);
+			}
 		},
 		fromTo : function(target, duration, from, to){
-			return new Tween(this, target, duration, to, from);
+			var tween = this.pool.get();
+			if (tween){
+				return tween.setup(target, duration, from, to);
+			} else {
+				return new Tween(this, target, duration, to, from);
+			}
 		}
 	};
 
