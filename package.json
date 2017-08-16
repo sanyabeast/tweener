@@ -1,12 +1,12 @@
 {
-    "version": "0.1.5-b",
+    "version": "0.1.6-b",
     "name": "tweener",
     "author": {
         "name": "Alex Gaivoronski",
         "email": "a.gvrnsk@gmail.com"
     },
     "scripts": {
-        "increase": "node node_modules/vpplus/vpplus.js increase-build"        
+        "increase": "node node_modules/vpplus/vpplus.js increase-build"
     },
     "repository": {
         "type": "git",

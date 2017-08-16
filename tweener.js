@@ -10,9 +10,6 @@
 	var tweener;
 
 	unicycle = new unicycle();
-	unicycle.start();
-
-	console.log(unicycle);
 
 	var Tween = function(target, duration, to, from){
 		this.started = false;
@@ -142,6 +139,9 @@
 	Tweener.prototype = {
 		to : function(target, duration, to){
 			return new Tween(target, duration, to);
+		},
+		fromTo : function(target, duration, from, to){
+			return new Tween(target, duration, to, from);
 		}
 	};
 
