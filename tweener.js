@@ -65,10 +65,10 @@
 			this.from = from || this.getFromObject(target, this.to);
 			this.current = this.cloneObject(this.from);
 
-			if (to.onUpdate) this.onUpdate = to.onUpdate;
-			if (to.onStart) this.onStart = to.onStart;
-			if (to.onComplete) this.onComplete = to.onComplete;
-			if (to.onRepeat) this.onRepeat = to.onRepeat;
+			this.onUpdate = to.onUpdate || null;
+			this.onStart = to.onStart || null;
+			this.onComplete = to.onComplete || null;
+			this.onRepeat = to.onRepeat || null;
 
 			if (this.to.paused != true){
 				this.restart();
