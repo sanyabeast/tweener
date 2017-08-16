@@ -1,0 +1,20 @@
+{
+    "version": "0.1.5-b",
+    "name": "tweener",
+    "author": {
+        "name": "Alex Gaivoronski",
+        "email": "a.gvrnsk@gmail.com"
+    },
+    "scripts": {
+        "increase": "node node_modules/vpplus/vpplus.js increase-build"        
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sanyabeast/tweener.git"
+    },
+    "dependencies": {
+        "requirejs": "latest",
+        "vpplus": "git://github.com/sanyabeast/vpplus.git",
+        "unicycle": "git://github.com/sanyabeast/unicycle.git"
+    }
+}
