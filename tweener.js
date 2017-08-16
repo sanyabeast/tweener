@@ -140,6 +140,9 @@
 
 		},
 		calcValue : function(from, to, progress){
+			from = Number(from);
+			to = Number(to);
+			
 			var progress = progress;
 			if (this.to.ease && EasingFunctions[this.to.ease]) progress = EasingFunctions[this.to.ease](progress);
 			var value = (from + ((to - from) * progress));
