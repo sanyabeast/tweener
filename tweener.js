@@ -142,7 +142,7 @@
 		calcValue : function(from, to, progress){
 			from = Number(from);
 			to = Number(to);
-			
+
 			var progress = progress;
 			if (this.to.ease && EasingFunctions[this.to.ease]) progress = EasingFunctions[this.to.ease](progress);
 			var value = (from + ((to - from) * progress));
@@ -233,7 +233,7 @@
 		fromTo : function(target, duration, from, to){
 			var tween = this.pool.get();
 			if (tween){
-				return tween.setup(target, duration, from, to);
+				return tween.setup(target, duration, to, from);
 			} else {
 				return new Tween(this, target, duration, to, from);
 			}
