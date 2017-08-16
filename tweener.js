@@ -10,31 +10,39 @@
 	var tweener;
 
 	unicycle = new unicycle();
+	unicycle.start();
 
-	var Tween = function(target, duration, to, from){
-		this.started = false;
-		this.paused = true;
-
-		this.target = target;
-		this.duration = duration * 1000;
-		this.to = to;
-		this.from = from || this.getFromObject(target, this.to);
-		this.current = this.cloneObject(this.from);
-
-		if (to.onUpdate) this.onUpdate = to.onUpdate;
-		if (to.onStart) this.onStart = to.onStart;
-		if (to.onComplete) this.onComplete = to.onComplete;
+	var Tween = function(tweener, target, duration, to, from){
+		this.tweener = tweener;
+		this.setup(target, duration, to, from);
 
 		this.tick = this.tick.bind(this);
 		this.startDate = +new Date();
 
-		if (to.paused != true){
+		if (this.to.paused != true){
 			this.restart();
 		}
 
 	};
 
 	Tween.prototype = {
+		setup : function(target, duration, to, from){
+			this.started = false;
+			this.paused = true;
+			this.repeatCount = 0;
+			this.yoyoPhase = false;
+
+			this.target = target;
+			this.duration = duration * 1000;
+			this.to = to;
+			this.from = from || this.getFromObject(target, this.to);
+			this.current = this.cloneObject(this.from);
+
+			if (to.onUpdate) this.onUpdate = to.onUpdate;
+			if (to.onStart) this.onStart = to.onStart;
+			if (to.onComplete) this.onComplete = to.onComplete;
+			if (to.onRepeat) this.onRepeat = to.onRepeat;
+		},
 		restart : function(){
 			if (this.removeTask){
 				this.removeTask();
@@ -62,14 +70,15 @@
 				return;
 			}
 
-			this.started = true;
-
 			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0));
 			this.removeTask = unicycle.addTask(this.tick);
 			this.paused = false;
 		},
 		get progress(){
 			return (+new Date() - this.startDate) / this.duration;
+		},
+		set progress(value){
+			this.startDate = (+new Date() - this.duration * value);
 		},
 		getFromObject : function(target, to){
 			var result = {};
@@ -97,14 +106,14 @@
 		},
 		calcValue : function(from, to, progress){
 			var value = (from + ((to - from) * progress));
-			if (value < from) value = from;
-			if (value > to) value = to;
 			return value; 
 		},
 		updateCurrent : function(){
 			var progress = this.progress;
+			var yoyo = this.yoyoPhase;
+
 			for (var k in this.current){
-				this.current[k] = this.calcValue(this.from[k], this.to[k], progress);
+				this.current[k] = yoyo ? this.calcValue(this.to[k], this.from[k], progress) : this.calcValue(this.from[k], this.to[k], progress);
 			}
 		},
 		applyValues : function(target, values){
@@ -118,14 +127,34 @@
 				if (this.onStart) this.onStart(this);
 			}
 
+
 			this.updateCurrent();
 			this.applyValues(this.target, this.current);
 
 			if (this.onUpdate) this.onUpdate(this);
-			if (this.progress > 1){
-				this.removeTask();
-				delete this.removeTask();
-				if (this.onComplete) this.onComplete(this);
+
+			if (this.progress >= 1){
+				this.yoyoPhase ? this.applyValues(this.target, this.from) : this.applyValues(this.target, this.to);
+
+				var expire = true;
+
+				this.repeatCount++;
+
+				if (typeof this.to.repeat == "number"){
+					if (this.to.repeat < 0 || this.repeatCount < this.to.repeat){
+						expire = false;
+					}
+				}
+
+				if (expire){
+					this.removeTask();
+					delete this.removeTask();
+					if (this.onComplete) this.onComplete(this);
+				} else {
+					if (this.to.yoyo) this.yoyoPhase = !this.yoyoPhase;
+					this.progress = 0;
+					if (this.onRepeat) this.onRepeat(this);
+				}	
 			}
 		}
 	};
@@ -137,11 +166,12 @@
 	};
 
 	Tweener.prototype = {
+		Tween : Tween,
 		to : function(target, duration, to){
-			return new Tween(target, duration, to);
+			return new Tween(this, target, duration, to);
 		},
 		fromTo : function(target, duration, from, to){
-			return new Tween(target, duration, to, from);
+			return new Tween(this, target, duration, to, from);
 		}
 	};
 

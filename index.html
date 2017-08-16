@@ -2,8 +2,58 @@
 <html>
 <head>
 	<title>Tweener</title>
+	<style type="text/css">
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			overflow: hidden;
+		}
+
+		#box {
+			width: 200px;
+			height: 200px;
+			position: absolute;
+			background: black;
+		}
+	</style>
 </head>
 <body>
+	<div id="box"></div>
+	<script type="text/javascript">
+		Object.defineProperties(window.Node.prototype, {
+			"x" : {
+				set : function(x){
+					this._x = x;
+					this.style.left = this._x + "px";
+				},
+				get : function(){
+					if (typeof this._x == "undefined") this._x = 0;
+					return this._x;
+				}
+			},
+			"y" : {
+				set : function(y){
+					this._y = y;
+					this.style.top = this._y + "px";
+				},
+				get : function(){
+					if (typeof this._y == "undefined") this._y = 0;
+					return this._y;
+				}
+			},
+			"scale" : {
+				set : function(scale){
+					this._scale = scale;
+					this.style.transform = "scale(" + scale + ")";
+				},
+				get : function(){
+					if (typeof this._scale == "undefined") this._scale = 1;
+					return this._scale;
+				}
+			}
+		});
+	</script>
 	<script data-main="main" src="node_modules/requirejs/require.js"></script>
 </body>
 </html>
