@@ -15,6 +15,7 @@ requirejs(["tweener"], function(tweener){
 		scale : 0.1,
 		repeat : -1,
 		yoyo : true,
+		ease : "easeInQuad",
 		onUpdate : function(tween){
 		},
 	    onComplete : function(){
