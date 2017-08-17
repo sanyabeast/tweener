@@ -62,10 +62,10 @@
 			this.yoyo = this.to.yoyo;
 
 			this.clearObject(this.callbacks);
-			this.onUpdate = to.onUpdate
-			this.onStart = to.onStart
-			this.onComplete = to.onComplete
-			this.onRepeat = to.onRepeat
+			this.callbacks.onUpdate = to.onUpdate
+			this.callbacks.onStart = to.onStart
+			this.callbacks.onComplete = to.onComplete
+			this.callbacks.onRepeat = to.onRepeat
 
 			if (this.to.paused != true){
 				this.restart();
@@ -292,11 +292,11 @@
 				if (expire){
 					this.removeTask();
 					delete this.removeTask();
-					if (this.callbacks.onComplete) this.callback("onComplete");
+					this.callback("onComplete");
 				} else {
 					if (this.yoyo) this.yoyoPhase = !this.yoyoPhase;
 					this.progress = 0;
-					if (this.callbacks.onRepeat) this.callback("onRepeat");
+					this.callback("onRepeat");
 				}	
 			}
 		},
