@@ -292,8 +292,8 @@
 				}
 
 				if (expire){
-					this.kill();
 					this.callback("onComplete");
+					this.kill();
 				} else {
 					if (this.yoyo) this.yoyoPhase = !this.yoyoPhase;
 					this.progress = 0;
