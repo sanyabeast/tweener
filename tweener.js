@@ -103,7 +103,7 @@
 			}
 
 			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0)) + (restart ? ((this.to.delay || 0) * 1000) : 0);
-			this.removeTask = unicycle.addTask(this.tick);
+			this.removeTask = unicycle.addTask(this.tick, "tween-" + (Math.random().toString(32).substring(3, 10)));
 			this.paused = false;
 		},
 		get progress(){
@@ -216,10 +216,22 @@
 		pool : {
 			content : [],
 			add : function(tween){
+				if (tween.arch){
+					return;
+				}
+
+				tween.arch;
+
 				this.content.push(tween);
 			},
 			get : function(){
-				return this.content.pop();
+				var tween = this.content.pop();
+
+				if (tween){
+					tween.arch = false;
+				}
+
+				return tween;
 			}
 		},
 		to : function(target, duration, to){
