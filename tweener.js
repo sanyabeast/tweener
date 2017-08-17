@@ -29,7 +29,10 @@
 	  easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
 	  easeInQuint: function (t) { return t*t*t*t*t },
 	  easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
-	  easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+	  easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t },
+	  easeInBack : function(t){ return t * t * ((2.5 + 1) * t - 2.5) },
+	  easeOutBack : function(t){ return --t * t * ((2.5 + 1) * t + 2.5) + 1 },
+	  easeInOutBack : function(t){ return ((t *= 2) < 1 ? t * t * ((2.5 + 1) * t - 2.5) : (t -= 2) * t * ((2.5 + 1) * t + 2.5) + 2) / 2; }
 	}
 
 	var Tween = function(tweener, target, duration, to, from){

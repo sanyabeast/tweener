@@ -6,11 +6,14 @@ requirejs.config({
 });
 
 requirejs(["tweener"], function(tweener){
+	window.tweener = tweener;
+
 	var parent = document.querySelector(".parent");
 
 	for (var a = 0, box; a < 200; a++){
 		box = document.createElement("div");
 		box.classList.add("box");
+		box.style.backgroundColor = ["hsl(", Math.floor(Math.random() * 360), ", 50%,25%)"].join("");
 		box.innerText = Math.random().toString(32).substring(3, 5);
 		parent.appendChild(box);
 	}
@@ -18,19 +21,21 @@ requirejs(["tweener"], function(tweener){
 	var boxes = document.querySelectorAll(".box");
 
 	for (var a = 0; a < boxes.length; a++){
+		createTween(boxes[a]);
+	}
 
-		tweener.to(boxes[a], Math.random() * 4 + 4, {
-			x : Math.random() * 500 - 250,
-			y :  Math.random() * 500 - 250,
-			opacity : 0.5,
-			scale :  Math.random() * 2,
-			repeat : -1,
-			yoyo : true,
-			ease : tweener.easingFunctions[Math.floor(Math.random() * 12)],
+	function createTween(target){
+		tweener.to(target, Math.random() * 10 + 3, {
+			x : Math.random() * window.innerWidth - (window.innerWidth / 2),
+			y : Math.random() * window.innerHeight - (window.innerHeight / 2),
+			opacity : Math.random(),
+			scale :  Math.random() * 3,
+			ease : tweener.easingFunctions[Math.floor(Math.random() * 15)],
 			onUpdate : function(tween){
+				tween.target.innerText = Math.ceil(this.progress * 100);
 			},
 		    onComplete : function(){
-		    	console.log("compete")
+		    	createTween(target);
 			},
 			onStart : function(){
 				console.log("start");
@@ -40,6 +45,13 @@ requirejs(["tweener"], function(tweener){
 			}
 		})
 	}
+
+	// tweener.to(document.querySelector(".box"), 2, {
+	// 	x : 200, 
+	// 	y : 200,
+	// 	ease : "easeInOutBack",
+	// 	repeat : -1,
+	// })
 
 
 });
