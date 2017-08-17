@@ -34,6 +34,8 @@
 
 	var Tween = function(tweener, target, duration, to, from){
 		this.tweener = tweener;
+		this.tweener.tweensCreated++;
+
 		this.tick = this.tick.bind(this);
 
 		this._from = {};
@@ -290,8 +292,7 @@
 				}
 
 				if (expire){
-					this.removeTask();
-					delete this.removeTask();
+					this.kill();
 					this.callback("onComplete");
 				} else {
 					if (this.yoyo) this.yoyoPhase = !this.yoyoPhase;
@@ -302,6 +303,7 @@
 		},
 		kill : function(){
 			if (this.removeTask) this.removeTask();
+			delete this.removeTask;
 			this.tweener.pool.add(this);
 		}
 	};
@@ -310,6 +312,9 @@
 		if (newInstance !== true && tweener instanceof Tweener){
 			return tweener;
 		}
+
+		this.tweensCreated = 0;
+
 	};
 
 	Tweener.prototype = {
