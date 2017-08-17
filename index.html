@@ -10,46 +10,80 @@
 			overflow: hidden;
 		}
 
-		#box {
-			width: 200px;
-			height: 200px;
-			position: absolute;
+		.box {
+			width: 50px;
+			height: 50px;
 			background: black;
+			margin-right: 32px;
+			margin-bottom: 32px;
+			border-radius: 50%;
+			color: white;
+			text-align: center;
+			justify-content: center;
+			align-items: center;
+			display: flex;
+		}
+
+		.parent {
+			display: flex;
+			flex-wrap: wrap;
 		}
 	</style>
 </head>
 <body>
-	<div id="box"></div>
+	<div class="parent">
+	</div>
 	<script type="text/javascript">
 		Object.defineProperties(window.Node.prototype, {
+			"matrix" : {
+				get : function(){
+					if (this._matrix){
+						return this._matrix;
+					} else {
+						this._matrix = [1, 0, 0, 1, 0, 0];
+						return this._matrix;
+					}
+				},
+				set : function(matrix){
+					this._matrix = matrix;
+					this.style.transform = "matrix(" + this._matrix.join(",") + ")"
+				}
+			},
 			"x" : {
 				set : function(x){
-					this._x = x;
-					this.style.left = this._x + "px";
+					this.matrix[4] = x;
+					this.matrix = this.matrix;
 				},
 				get : function(){
-					if (typeof this._x == "undefined") this._x = 0;
-					return this._x;
+					return this.matrix[4];
 				}
 			},
 			"y" : {
 				set : function(y){
-					this._y = y;
-					this.style.top = this._y + "px";
+					this.matrix[5] = y;
+					this.matrix = this.matrix;
 				},
 				get : function(){
-					if (typeof this._y == "undefined") this._y = 0;
-					return this._y;
+					return this.matrix[5];
 				}
 			},
 			"scale" : {
 				set : function(scale){
-					this._scale = scale;
-					this.style.transform = "scale(" + scale + ")";
+					this.matrix[0] = this.matrix[3] = scale;
+					this.matrix = this.matrix;
 				},
 				get : function(){
-					if (typeof this._scale == "undefined") this._scale = 1;
-					return this._scale;
+					return this.matrix[0];
+				}
+			},
+			"opacity" : {
+				set : function(opacity){
+					this._opacity = opacity;
+					this.style.opacity = opacity;
+				},
+				get : function(){
+					if (typeof this._opacity == "undefined") this._opacity = 1;
+					return this._opacity;
 				}
 			}
 		});
