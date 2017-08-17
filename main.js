@@ -10,7 +10,7 @@ requirejs(["tweener"], function(tweener){
 
 	var parent = document.querySelector(".parent");
 
-	for (var a = 0, box; a < 200; a++){
+	for (var a = 0, box; a < 150; a++){
 		box = document.createElement("div");
 		box.classList.add("box");
 		box.style.backgroundColor = ["hsl(", Math.floor(Math.random() * 360), ", 50%,25%)"].join("");
@@ -38,10 +38,10 @@ requirejs(["tweener"], function(tweener){
 		    	createTween(target);
 			},
 			onStart : function(){
-				console.log("start");
+				// console.log("start");
 			},
 			onRepeat : function(){
-				console.log("repeat");
+				// console.log("repeat");
 			}
 		})
 	}
