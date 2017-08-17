@@ -327,7 +327,7 @@
 					return;
 				}
 
-				tween.pooled;
+				tween.pooled = true;
 				this.content.push(tween);
 			},
 			get : function(){
