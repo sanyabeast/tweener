@@ -8,7 +8,7 @@
 - easeInCubic
 - easeOutCubic
 - easeInOutCubic
-- - easeInQuart
+- easeInQuart
 - easeOutQuart
 - easeInOutQuart
 - easeInQuint
