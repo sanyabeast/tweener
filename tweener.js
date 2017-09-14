@@ -44,6 +44,7 @@
 		this._from = {};
 		this._to = {};
 		this._current = {};
+		this._presets = {};
 		this.callbacks = {};
 
 		this.setup(target, duration, to, from);
@@ -323,6 +324,31 @@
 	Tweener.prototype = {
 		Tween : Tween,
 		easingFunctions : easingFunctions,
+		console : {
+			warn : function(message, data){
+				data ? console.warn("Tweener:", message) : console.warn("Tweener:", message, data);
+			}
+		},
+		get presets(){
+			return this._presets;
+		},
+		set presets(data){
+			for (var k in data){
+				this._presets[k] = data[k];
+			}
+		},
+		runPreset : function(name, target){
+			var preset = this._presets[name];
+			if (preset){
+				if (preset.from && preset.to && preset.duration){
+					return this.fromTo(target, preset.duration, preset.from, preset.to);
+				} else if (preset.to && preset.duration){
+					return this.to(target, preset.duration, preset.to);
+				}
+			} else {
+				this.console.warn("no sunch preset", name);
+			}
+		},
 		pool : {
 			content : [],
 			add : function(tween){
