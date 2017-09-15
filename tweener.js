@@ -35,6 +35,39 @@
 	  easeInOutBack : function(t){ return ((t *= 2) < 1 ? t * t * ((2.5 + 1) * t - 2.5) : (t -= 2) * t * ((2.5 + 1) * t + 2.5) + 2) / 2; }
 	}
 
+	var TweensList = function(){
+		this._content = {};
+	};
+
+	TweensList.prototype = {
+		iterate : function(callback, context){
+			for (var k in this._content){
+				callback.call(context, this._content[k], k);
+			}
+
+			return this;
+		},
+		add : function(name, tween){
+			this._content[name] = tween;
+			return this;
+		},
+		remove : function(name){
+			delete this._content[name];
+		},
+		kill : function(name){
+			if (this._content[name]) {
+				this._content[name].kill();
+			}
+		},
+		killAll : function(){
+			this.iterate(function(tween){
+				tween.kill();
+			}, this);
+		}
+	};
+
+
+
 	var Tween = function(tweener, target, duration, to, from){
 		this.tweener = tweener;
 		this.tweener.tweensCreated++;
@@ -44,7 +77,6 @@
 		this._from = {};
 		this._to = {};
 		this._current = {};
-		this._presets = {};
 		this.callbacks = {};
 
 		this.setup(target, duration, to, from);
@@ -59,6 +91,10 @@
 
 			this.duration = duration * 1000;
 			this.target = target;
+
+			this.target.__tweensList = new TweensList();
+			this.target.__tweensList.add(this.id, this);
+
 			this.to = to;
 			this.from = from;
 			this.current = this.from;
@@ -78,6 +114,10 @@
 			}
 
 			return this;
+		},
+		get id(){
+			if (!this._id) this._id = "tween-" + (Math.random().toString(32).substring(3, 16));
+			return this._id;
 		},
 		/**********************************************/
 		/*helpers*/
@@ -210,7 +250,7 @@
 			if (!this.paused){ return; }
 
 			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0));
-			this.removeTask = unicycle.addTask(this.tick, "tween-" + (Math.random().toString(32).substring(3, 10)));
+			this.removeTask = unicycle.addTask(this.tick, this.id);
 			this.paused = false;
 		},
 		/*callbacks*/
@@ -306,6 +346,7 @@
 			}
 		},
 		kill : function(){
+			this.target.__tweensList.remove(this.id);
 			if (this.removeTask) this.removeTask();
 			delete this.removeTask;
 			this.tweener.pool.add(this);
@@ -316,6 +357,8 @@
 		if (newInstance !== true && tweener instanceof Tweener){
 			return tweener;
 		}
+
+		this._presets = {};
 
 		this.tweensCreated = 0;
 
@@ -346,7 +389,7 @@
 					return this.to(target, preset.duration, preset.to);
 				}
 			} else {
-				this.console.warn("no sunch preset", name);
+				this.console.warn("no such preset", name);
 			}
 		},
 		pool : {
