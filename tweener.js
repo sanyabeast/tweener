@@ -68,7 +68,7 @@
 
 
 
-	var Tween = function(tweener, target, duration, to, from){
+	var Tween = function(tweener, target, duration, to, from, presetCallbacks){
 		this.tweener = tweener;
 		this.tweener.tweensCreated++;
 
@@ -78,12 +78,13 @@
 		this._to = {};
 		this._current = {};
 		this.callbacks = {};
+		this.presetCallbacks = {};
 
-		this.setup(target, duration, to, from);
+		this.setup(target, duration, to, from, presetCallbacks);
 	};
 
 	Tween.prototype = {
-		setup : function(target, duration, to, from){
+		setup : function(target, duration, to, from, presetCallbacks){
 			this.started = false;
 			this.paused = true;
 			this.repeated = 0;
@@ -102,6 +103,13 @@
 			this.ease = this.to.ease;
 			this.repeat = this.to.repeat;
 			this.yoyo = this.to.yoyo;
+
+			this.clearObject(this.presetCallbacks);
+			if (presetCallbacks){
+				for (var k in presetCallbacks){
+					this.presetCallbacks[k] = presetCallbacks[k];
+				}
+			}
 
 			this.clearObject(this.callbacks);
 			this.callbacks.onUpdate = to.onUpdate
@@ -262,6 +270,7 @@
 		},
 		callback : function(name){
 			if (this.callbacks[name]) this.callbacks[name].call(this, this);
+			if (this.presetCallbacks[name]) this.presetCallbacks[name].call(this, this);
 		},
 		/*control props*/
 		_started : false,
@@ -380,13 +389,13 @@
 				this._presets[k] = data[k];
 			}
 		},
-		runPreset : function(name, target){
+		runPreset : function(name, target, presetCallbacks){
 			var preset = this._presets[name];
 			if (preset){
 				if (preset.from && preset.to && preset.duration){
-					return this.fromTo(target, preset.duration, preset.from, preset.to);
+					return this.fromTo(target, preset.duration, preset.from, preset.to, presetCallbacks);
 				} else if (preset.to && preset.duration){
-					return this.to(target, preset.duration, preset.to);
+					return this.to(target, preset.duration, preset.to, presetCallbacks);
 				}
 			} else {
 				this.console.warn("no such preset", name);
@@ -412,20 +421,20 @@
 				return tween;
 			}
 		},
-		to : function(target, duration, to){
+		to : function(target, duration, to, presetCallbacks){
 			var tween = this.pool.get();
 			if (tween){
-				return tween.setup(target, duration, to);
+				return tween.setup(target, duration,  to, null, presetCallbacks);
 			} else {
-				return new Tween(this, target, duration, to);
+				return new Tween(this, target, duration,  to, null, presetCallbacks);
 			}
 		},
-		fromTo : function(target, duration, from, to){
+		fromTo : function(target, duration, from, to, presetCallbacks){
 			var tween = this.pool.get();
 			if (tween){
-				return tween.setup(target, duration, to, from);
+				return tween.setup(target, duration, to, from, presetCallbacks);
 			} else {
-				return new Tween(this, target, duration, to, from);
+				return new Tween(this, target, duration, to, from, presetCallbacks);
 			}
 		}
 	};
