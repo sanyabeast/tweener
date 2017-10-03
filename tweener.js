@@ -12,6 +12,8 @@
 	unicycle = new unicycle();
 	unicycle.start();
 
+	window.unicycle = unicycle;
+
 	/*
 	 * Easing Functions - inspired from http://gizma.com/easing/
 	 * only considering the t value for the range [0, 1] => [0, 1]
@@ -51,17 +53,20 @@
 			this._content[name] = tween;
 			return this;
 		},
+		contains : function(name){
+			return this._content[name] && this._content[name] instanceof Tween;
+		},
 		remove : function(name){
 			delete this._content[name];
 		},
 		kill : function(name){
 			if (this._content[name]) {
-				this._content[name].kill();
+				this._content[name].kill("tweenslist-single");
 			}
 		},
 		killAll : function(){
 			this.iterate(function(tween){
-				tween.kill();
+				tween.kill("tweenslist-all");
 			}, this);
 		}
 	};
@@ -79,6 +84,7 @@
 		this._current = {};
 		this.callbacks = {};
 		this.presetCallbacks = {};
+		this.state = "created";
 
 		this.setup(target, duration, to, from, presetCallbacks);
 	};
@@ -250,6 +256,7 @@
 		},
 		pause : function(){
 			if (this.paused){ return; }
+			this.state = "paused";
 			this.paused = true;
 			this.removeTask();
 			this.pauseProgress = this.progress;
@@ -257,6 +264,7 @@
 		resume : function(restart){
 			if (!this.paused){ return; }
 
+			this.state = "started";
 			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0));
 			this.removeTask = unicycle.addTask(this.tick, this.id);
 			this.paused = false;
@@ -326,6 +334,7 @@
 		tick : function(delta){
 			if (!this.started){
 				this.started = true;
+				this.state = "started";
 				this.callback("onStart");
 			}
 
@@ -345,8 +354,10 @@
 				}
 
 				if (expire){
+					// console.log(this);
+					this.state = "completed";
 					this.callback("onComplete");
-					this.kill();
+					this.kill("self");
 				} else {
 					if (this.yoyo) this.yoyoPhase = !this.yoyoPhase;
 					this.progress = 0;
@@ -354,7 +365,9 @@
 				}	
 			}
 		},
-		kill : function(){
+		kill : function(killer){
+			this.state = "killed";
+			this.killer = killer || "user";
 			this.target.__tweensList.remove(this.id);
 			if (this.removeTask) this.removeTask();
 			delete this.removeTask;
@@ -404,6 +417,7 @@
 		pool : {
 			content : [],
 			add : function(tween){
+				return null;
 				if (tween.pooled){
 					return;
 				}
@@ -412,6 +426,7 @@
 				this.content.push(tween);
 			},
 			get : function(){
+				return null;
 				var tween = this.content.pop();
 
 				if (tween){
