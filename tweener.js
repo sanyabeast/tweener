@@ -241,6 +241,8 @@
 
 			if (this.easingFunctions[value]){
 				this._ease = this.easingFunctions[value];
+			} else if (typeof value == "function"){
+				this._ease = value;
 			}
 		},
 		/**********************************************/
