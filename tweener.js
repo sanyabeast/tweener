@@ -101,8 +101,10 @@
 			this.duration = duration * 1000;
 			this.target = target;
 
-			this.target.__tweensList = new TweensList();
-			this.target.__tweensList.add(this.id, this);
+			if (!tweener.dontUseTweensList){
+				this.target.__tweensList = new TweensList();
+				this.target.__tweensList.add(this.id, this);
+			}
 
 			this.to = to;
 			this.from = from;
@@ -372,7 +374,11 @@
 		kill : function(killer){
 			this.state = "killed";
 			this.killer = killer || "user";
-			this.target.__tweensList.remove(this.id);
+			
+			if (!tweener.dontUseTweensList){
+				this.target.__tweensList.remove(this.id);
+			}
+			
 			if (this.removeTask) this.removeTask();
 			delete this.removeTask;
 			this.tweener.pool.add(this);
