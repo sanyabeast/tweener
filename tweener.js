@@ -382,6 +382,11 @@
 			if (this.removeTask) this.removeTask();
 			delete this.removeTask;
 			this.tweener.pool.add(this);
+		},
+		finish: function(){
+			this.progress = 1;
+			this.recalcCurrent();
+			this.copyValues(this.target, this.current);
 		}
 	};
 
