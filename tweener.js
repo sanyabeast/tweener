@@ -10,6 +10,7 @@
 	"use strict";
 
 	var tweener;
+	var Tweener;
 
 	unicycle = new unicycle();
 	unicycle.start();
@@ -272,6 +273,11 @@
 
 			this.state = "started";
 			this.startDate = (+new Date() - this.duration * (this.pauseProgress || 0));
+
+			if (tweener.animationsDisabled){
+				this.progress = 1;
+			}
+
 			this.removeTask = unicycle.addTask(this.tick, this.id);
 			this.paused = false;
 		},
@@ -285,6 +291,14 @@
 		callback : function(name){
 			if (this.callbacks[name]) this.callbacks[name].call(this, this);
 			if (this.presetCallbacks[name]) this.presetCallbacks[name].call(this, this);
+			if (name == "onStart" && Tweener.globalOnStart) {
+				Tweener.globalOnStart(this)
+			}
+
+			if (name == "onComplete" && Tweener.globalOnComplete) {
+				Tweener.globalOnComplete(this)
+			}
+
 		},
 		/*control props*/
 		_started : false,
@@ -390,7 +404,7 @@
 		}
 	};
 
-	var Tweener = function(newInstance){
+	Tweener = function(newInstance){
 		if (newInstance !== true && tweener instanceof Tweener){
 			return tweener;
 		}
@@ -402,12 +416,16 @@
 	};
 
 	Tweener.prototype = {
+		animationsDisabled: false,
 		Tween : Tween,
 		easingFunctions : easingFunctions,
 		console : {
 			warn : function(message, data){
 				data ? console.warn("Tweener:", message) : console.warn("Tweener:", message, data);
 			}
+		},
+		setAnimationsDisabled: function(key){
+			this.animationsDisabled = key
 		},
 		get presets(){
 			return this._presets;
@@ -466,8 +484,21 @@
 			} else {
 				return new Tween(this, target, duration, to, from, presetCallbacks);
 			}
+		},
+		setGlobalOnStart:  function(callback){
+			Tweener.globalOnStart = callback
+		},
+
+		setGlobalOnComplete: function(callback){
+			Tweener.globalOnComplete = callback
 		}
 	};
+
+	// Tweener.setPostal = function(postal){
+	// 	Tweener.postal = postal
+	// }
+
+	
 
 	var tweener = new Tweener();
     return tweener;
